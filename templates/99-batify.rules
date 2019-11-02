@@ -1,0 +1,27 @@
+{% for bat in batteries_watched %}
+ACTION=="change", KERNEL=="{{ bat }}", \
+SUBSYSTEM=="power_supply", \
+ATTR{status}=="Discharging", \
+ATTR{capacity}=="[0-9]", \
+IMPORT{program}="/usr/local/bin/xpub", \
+RUN+="/bin/su $env{XUSER} -c '/usr/bin/notify-send -a batify -u critical {{ bat }}Discharging:$attr{capacity}%'"
+
+ACTION=="change", KERNEL=="{{ bat }}", \
+SUBSYSTEM=="power_supply", \
+ATTR{status}=="Discharging", \
+ATTR{capacity}=="1[0-5]", \
+IMPORT{program}="/usr/local/bin/xpub", \
+RUN+="/bin/su $env{XUSER} -c '/usr/bin/notify-send -a batify -u normal {{ bat }}Discharging:$attr{capacity}%'"
+{% endfor %}
+
+SUBSYSTEM=="power_supply", ACTION=="change", \
+ENV{POWER_SUPPLY_ONLINE}=="0", ENV{POWER}="off", \
+OPTIONS+="last_rule", \
+IMPORT{program}="/usr/local/bin/xpub", \
+RUN+="/bin/su $env{XUSER} -c '/usr/bin/notify-send -a batify -u low UnPlugged'"
+
+SUBSYSTEM=="power_supply", ACTION=="change", \
+ENV{POWER_SUPPLY_ONLINE}=="1", ENV{POWER}="on", \
+OPTIONS+="last_rule", \
+IMPORT{program}="/usr/local/bin/xpub", \
+RUN+="/bin/su $env{XUSER} -c '/usr/bin/notify-send -a batify -u low PluggedIn'"

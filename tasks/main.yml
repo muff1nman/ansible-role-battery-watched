@@ -1,0 +1,11 @@
+---
+- name: Setup xpub utility
+  copy:
+    src: xpub.sh
+    dest: /usr/local/bin/xpub
+    mode: 0755
+- name: Setup udev battery events
+  template:
+    src: 99-batify.rules
+    dest: /etc/udev/rules.d/99-batify.rules
+  notify: [ "udev" ]
